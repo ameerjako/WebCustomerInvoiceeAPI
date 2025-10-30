@@ -31,14 +31,15 @@ namespace WebCustomerInvoiceAPI.Controllers
             {
                 return NotFound();
             }
-
+            _context.Orderdetail.RemoveRange( _context.Orderdetail.Where(od => od.Order.customer_id == id));
+            _context.Order.RemoveRange(_context.Order.Where(o => o.customer_id == id));
             _context.Customer.Remove(itemtoDelete);
             await _context.SaveChangesAsync();
 
             return Ok(itemtoDelete);
         }
 
-        [HttpPost]
+        [HttpPost ("add")]
         public async Task<ActionResult<Customer>> AddCustomer([FromBody] Customer customer)
         {
             if (customer == null)
@@ -46,6 +47,7 @@ namespace WebCustomerInvoiceAPI.Controllers
                 return NotFound();
             }
             await _context.Customer.AddAsync(customer);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(
                                     nameof(GetCustomer),
                                     new { id = customer.customer_id },
